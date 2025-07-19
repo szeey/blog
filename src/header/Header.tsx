@@ -1,5 +1,5 @@
 import Box from '@mui/material/Box';
-import logoImage from './assets/logo.png';
+import logoImage from '../assets/logo.png';
 
 export default function Header() {
   const handleScrollToTop = () => {
@@ -37,7 +37,7 @@ export default function Header() {
             width: 'auto',
             transition: 'transform 0.2s ease-in-out',
             '&:hover': {
-              transform: 'scale(1.05)',
+              transform: 'scale(1.1)',
             },
           }}
         />
