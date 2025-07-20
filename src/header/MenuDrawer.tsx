@@ -2,10 +2,6 @@ import Drawer from '@mui/material/Drawer';
 import { useMenu } from '../contexts/MenuContext';
 import MenuPage from '../pages/MenuPage';
 
-/**
- * 메뉴 팝업(Drawer) UI를 담당하는 컴포넌트입니다.
- * useMenu 훅을 통해 스스로 열리고 닫힙니다.
- */
 const MenuDrawer = () => {
   const { isMenuOpen, closeMenu } = useMenu();
 
@@ -24,7 +20,6 @@ const MenuDrawer = () => {
         },
       }}
     >
-      {/* 이제 MenuPage는 props가 필요 없습니다. */}
       <MenuPage />
     </Drawer>
   );

@@ -5,15 +5,15 @@ import IconButton from '@mui/material/IconButton';
 import Box from '@mui/material/Box';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
+import MusicNoteOutlinedIcon from '@mui/icons-material/MusicNoteOutlined';
 import { useTheme } from '@mui/material/styles';
-// MenuContext에서 useMenu 훅을 import 합니다.
 import { useMenu } from '../contexts/MenuContext';
+import { useMusicPlayer } from '../contexts/MusicPlayerContext';
 
-// 더 이상 props를 받을 필요가 없으므로 interface를 제거합니다.
 const NavBar = () => {
   const theme = useTheme();
-  // Context에서 메뉴를 여는 함수를 직접 가져옵니다.
   const { openMenu } = useMenu();
+  const { openPlayer } = useMusicPlayer();
 
   return (
     <AppBar
@@ -46,7 +46,6 @@ const NavBar = () => {
             alignItems: 'center',
           }}
         >
-          {/* 메뉴 버튼 클릭 시 context의 openMenu 함수를 직접 호출합니다. */}
           <IconButton onClick={openMenu} aria-label="메뉴 열기">
             <MenuIcon />
           </IconButton>
@@ -54,8 +53,9 @@ const NavBar = () => {
           <IconButton component={RouterLink} to="/" aria-label="홈으로 이동">
             <HomeOutlinedIcon />
           </IconButton>
-
-          <Box sx={{ width: 40, height: 40 }} />
+          <IconButton onClick={openPlayer} aria-label="음악 플레이어 열기">
+            <MusicNoteOutlinedIcon />
+          </IconButton>
         </Box>
       </Toolbar>
     </AppBar>
