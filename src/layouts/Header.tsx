@@ -32,14 +32,15 @@ export default function Header() {
           component="img"
           src={logoImage}
           alt="Main blog's logo"
-          sx={{
+          sx={(theme) => ({
             height: 60,
             width: 'auto',
-            transition: 'transform 0.2s ease-in-out',
-            '&:hover': {
-              transform: 'scale(1.1)',
-            },
-          }}
+            filter: theme.palette.mode === 'dark' ? 'brightness(0) invert(1)' : 'none',
+            transition: theme.transitions.create(['transform', 'filter'], {
+              duration: theme.transitions.duration.shorter,
+            }),
+            '&:hover': { transform: 'scale(1.1)' },
+          })}
         />
       </Box>
     </Box>

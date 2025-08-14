@@ -7,14 +7,15 @@ import Box from '@mui/material/Box';
 import { lightTheme, darkTheme } from './assets/theme';
 import { MenuProvider, useMenu } from './contexts/MenuContext';
 import { MusicPlayerProvider, useMusicPlayer } from './contexts/MusicPlayerContext';
-import MenuDrawer from './header/MenuDrawer';
+import MenuDrawer from './layouts/MenuDrawer';
 import NowPlayingDrawer from './pages/NowPlayingDrawer';
 
-import Header from './header/Header';
-import NavBar from './header/NavBar';
+import Header from './layouts/Header';
+import NavBar from './layouts/NavBar';
 import MainPage from './pages/MainPage';
 import AboutPage from './pages/AboutPage';
 import PostsPage from './pages/PostsPage';
+import PostDetailPage from './pages/PostDetailPage';
 
 const MainContent = () => {
   const { isMenuOpen } = useMenu();
@@ -36,11 +37,12 @@ const MainContent = () => {
         filter: isPopupOpen ? 'blur(4px) brightness(0.7)' : 'none',
       }}
     >
-      <Routes>
-        <Route path="/" element={<MainPage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/posts" element={<PostsPage />} />
-      </Routes>
+          <Routes>
+            <Route path="/" element={<MainPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/posts" element={<PostsPage />} />
+            <Route path="/posts/:slug" element={<PostDetailPage />} />
+          </Routes>
     </Box>
   );
 };
