@@ -44,6 +44,7 @@ const NowPlayingDrawer = () => {
   const [currentTime, setCurrentTime] = React.useState(0);
   const playerHandleRef = React.useRef<{ getCurrentTime: () => number; getDuration: () => number; seekTo: (s: number) => void } | null>(null);
   const [openPlaylist, setOpenPlaylist] = React.useState(false);
+  const isScrubbingRef = React.useRef(false);
 
   React.useEffect(() => {
     const id = window.setInterval(() => {
@@ -52,8 +53,8 @@ const NowPlayingDrawer = () => {
       const d = h.getDuration();
       const t = h.getCurrentTime();
       if (Number.isFinite(d)) setDuration(d);
-      if (Number.isFinite(t)) setCurrentTime(t);
-    }, 500);
+      if (!isScrubbingRef.current && Number.isFinite(t)) setCurrentTime(t);
+    }, 250);
     return () => window.clearInterval(id);
   }, []);
 
@@ -63,6 +64,7 @@ const NowPlayingDrawer = () => {
 
   const handleSeek = (_: Event, value: number | number[]) => {
     const v = Array.isArray(value) ? value[0] : value;
+    setCurrentTime(v);
     playerHandleRef.current?.seekTo(v);
   };
 
@@ -180,7 +182,7 @@ const NowPlayingDrawer = () => {
 
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', width: '100%', maxWidth: 720 }}>
                 <Typography variant="h6" component="div" noWrap>
-                  {currentTrack.title}
+                  <strong>{currentTrack.title}</strong>
                 </Typography>
                 <Typography variant="body1" color="text.secondary" noWrap>
                   {formatArtist(currentTrack.artist)}
@@ -193,6 +195,9 @@ const NowPlayingDrawer = () => {
                     max={Math.max(1, Math.floor(duration))}
                     value={Math.min(Math.floor(currentTime), Math.floor(duration) || 1)}
                     onChange={handleSeek}
+                    onChangeCommitted={() => { isScrubbingRef.current = false; }}
+                    onMouseDown={() => { isScrubbingRef.current = true; }}
+                    onTouchStart={() => { isScrubbingRef.current = true; }}
                     aria-label="progress"
                     sx={(theme) => ({
                       height: 8,

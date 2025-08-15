@@ -91,8 +91,20 @@ export default function YouTubeAudio({ url, playing, onReady, onEnded }: { url: 
       if (playerRef.current) {
         try {
           playerRef.current.loadVideoById(videoId);
-          if (desiredPlayRef.current) playerRef.current.playVideo();
-          else playerRef.current.pauseVideo();
+          if (desiredPlayRef.current) {
+            // Force-start with mute trick for mobile Safari consistency
+            try {
+              playerRef.current.mute();
+            } catch {}
+            try {
+              playerRef.current.playVideo();
+            } catch {}
+            setTimeout(() => {
+              try { playerRef.current.unMute(); } catch {}
+            }, 200);
+          } else {
+            playerRef.current.pauseVideo();
+          }
         } catch {
           // ignore
         }
@@ -145,7 +157,15 @@ export default function YouTubeAudio({ url, playing, onReady, onEnded }: { url: 
             }
           },
           onStateChange: (e: any) => {
+            // 0 ended, 5 cued
             if (e?.data === 0 && onEnded) onEnded();
+            if (e?.data === 5 && desiredPlayRef.current) {
+              try {
+                playerRef.current.mute();
+                playerRef.current.playVideo();
+                setTimeout(() => { try { playerRef.current.unMute(); } catch {} }, 200);
+              } catch {}
+            }
           },
         },
       });
