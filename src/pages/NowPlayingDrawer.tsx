@@ -8,7 +8,7 @@ import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
-import YouTubeAudio from '../components/YouTubeAudio';
+import YouTubeAudio from '../songs/YouTubeAudio';
 import Slider from '@mui/material/Slider';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import QueueMusicIcon from '@mui/icons-material/QueueMusic';
