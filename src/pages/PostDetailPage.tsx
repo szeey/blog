@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -9,6 +9,11 @@ export default function PostDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const posts = useMemo(() => loadPosts(), []);
   const post = posts.find((p) => p.slug === slug);
+
+  useEffect(() => {
+    // Ensure viewing starts at the top whenever the slug changes
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [slug]);
 
   if (!post) {
     return (

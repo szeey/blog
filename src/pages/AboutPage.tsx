@@ -3,9 +3,24 @@ import Typography from '@mui/material/Typography';
 
 export default function AboutPage() {
   return (
-    <Box>
-      <Typography variant="h4">About</Typography>
-      <Typography>이 블로그에 대한 소개 페이지입니다.</Typography>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        px: 2,
+        width: "100%",
+      }}
+    >
+      <Box
+        sx={{
+          width: "100%",
+          maxWidth: 720,
+        }}
+      >
+        <Typography variant="h3" sx={{ mb: 1, textAlign: "left" }}>
+          About
+        </Typography>
+      </Box>
     </Box>
   );
 };

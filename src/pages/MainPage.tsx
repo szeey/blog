@@ -1,9 +1,6 @@
 import React from 'react';
 import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { loadPosts } from '../posts/loadPosts';
 import { useNavigate } from 'react-router-dom';
 
@@ -179,38 +176,6 @@ export default function MainPage() {
             );
           })}
         </Box>
-
-        <IconButton
-          aria-label="Previous"
-          onClick={goPrev}
-          sx={{
-            position: 'fixed',
-            left: 8,
-            top: '50%',
-            transform: 'translateY(-50%)',
-            bgcolor: 'background.paper',
-            boxShadow: 2,
-            '&:hover': { bgcolor: 'background.paper' },
-          }}
-        >
-          <ChevronLeftIcon />
-        </IconButton>
-
-        <IconButton
-          aria-label="Next"
-          onClick={goNext}
-          sx={{
-            position: 'fixed',
-            right: 8,
-            top: '50%',
-            transform: 'translateY(-50%)',
-            bgcolor: 'background.paper',
-            boxShadow: 2,
-            '&:hover': { bgcolor: 'background.paper' },
-          }}
-        >
-          <ChevronRightIcon />
-        </IconButton>
       </Box>
 
       {/* Centered pagination dots placed between coverflow and NavBar */}
