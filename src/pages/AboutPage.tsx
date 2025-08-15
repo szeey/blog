@@ -9,6 +9,7 @@ export default function AboutPage() {
         justifyContent: "center",
         px: 2,
         width: "100%",
+        alignSelf: "flex-start",
       }}
     >
       <Box

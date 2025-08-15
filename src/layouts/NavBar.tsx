@@ -26,7 +26,7 @@ const NavBar = () => {
           bottom: 24,
           left: '50%',
           transform: 'translateX(-50%)',
-          width: 'auto',
+          width: { xs: 'min(560px, calc(100% - 32px))', sm: 'auto' },
           borderRadius: '32px',
           boxShadow: theme.shadows[8],
           backgroundColor:
@@ -38,7 +38,7 @@ const NavBar = () => {
           border: `1px solid ${theme.palette.divider}`,
         }}
       >
-        <Toolbar sx={{ px: 2 }}>
+        <Toolbar sx={{ px: { xs: 1.5, sm: 2 } }}>
           <Box
             sx={{
               width: '100%',

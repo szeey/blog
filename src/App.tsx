@@ -28,7 +28,7 @@ const MainContent = () => {
       component="main"
       sx={{
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         justifyContent: 'center',
         minHeight: '100vh',
         pt: '100px',

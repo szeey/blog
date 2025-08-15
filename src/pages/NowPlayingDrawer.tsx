@@ -87,19 +87,25 @@ const NowPlayingDrawer = () => {
         disableScrollLock: true,
       }}
       sx={{
-        '& .MuiDrawer-paper': {
+        '& .MuiDrawer-paper': (theme) => ({
           borderTopLeftRadius: 24,
           borderTopRightRadius: 24,
-          backgroundColor: 'rgba(255, 255, 255, 0.7)',
+          backgroundColor:
+            theme.palette.mode === 'dark'
+              ? 'rgba(24, 24, 24, 0.75)'
+              : 'rgba(255, 255, 255, 0.75)',
           backdropFilter: 'blur(28px)',
           WebkitBackdropFilter: 'blur(28px)',
-          border: (theme) => `1px solid ${theme.palette.divider}`,
-          boxShadow: '0 -20px 60px rgba(0,0,0,0.15)',
+          border: `1px solid ${theme.palette.divider}`,
+          boxShadow:
+            theme.palette.mode === 'dark'
+              ? '0 -16px 50px rgba(0,0,0,0.5)'
+              : '0 -20px 60px rgba(0,0,0,0.15)',
           p: 4,
           display: 'flex',
           alignItems: 'center',
           gap: 2,
-        },
+        }),
       }}
     >
       {currentTrack?.url && (
@@ -196,32 +202,40 @@ const NowPlayingDrawer = () => {
                   </Box>
                 </Box>
 
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 2, width: '100%', px: 1 }}>
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(7, 1fr)',
+                    alignItems: 'center',
+                    justifyItems: 'center',
+                    mt: 2,
+                    width: '100%',
+                    px: 1,
+                    columnGap: 0,
+                  }}
+                >
                   <IconButton aria-label="YouTube로 열기" onClick={() => { if (currentTrack?.url) window.open(currentTrack.url, '_blank', 'noopener,noreferrer'); }}>
                     <YouTubeIcon />
                   </IconButton>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <IconButton aria-label="셔플" color={isShuffling ? 'primary' : 'default'} onClick={toggleShuffle}>
-                      <ShuffleIcon />
-                    </IconButton>
-                    <IconButton aria-label="이전 곡" onClick={playPrevious}>
-                      <SkipPreviousIcon sx={{ fontSize: 30 }} />
-                    </IconButton>
-                    <IconButton aria-label="재생/일시정지" onClick={togglePlay}>
-                      {isPlaying ? (
-                        <PauseIcon sx={{ fontSize: 40 }} />
-                      ) : (
-                        <PlayArrowIcon sx={{ fontSize: 40 }} />
-                      )}
-                    </IconButton>
-                    <IconButton aria-label="다음 곡" onClick={playNext}>
-                      <SkipNextIcon sx={{ fontSize: 30 }} />
-                    </IconButton>
-                    <IconButton aria-label="반복" color={repeatMode !== 'off' ? 'primary' : 'default'} onClick={cycleRepeatMode}>
-                      {repeatMode === 'one' ? <RepeatIcon sx={{ display: 'none' }} /> : null}
-                      {repeatMode === 'one' ? <RepeatOneIcon /> : <RepeatIcon />}
-                    </IconButton>
-                  </Box>
+                  <IconButton aria-label="셔플" color={isShuffling ? 'primary' : 'default'} onClick={toggleShuffle}>
+                    <ShuffleIcon />
+                  </IconButton>
+                  <IconButton aria-label="이전 곡" onClick={playPrevious}>
+                    <SkipPreviousIcon sx={{ fontSize: 30 }} />
+                  </IconButton>
+                  <IconButton aria-label="재생/일시정지" onClick={togglePlay}>
+                    {isPlaying ? (
+                      <PauseIcon sx={{ fontSize: 40 }} />
+                    ) : (
+                      <PlayArrowIcon sx={{ fontSize: 40 }} />
+                    )}
+                  </IconButton>
+                  <IconButton aria-label="다음 곡" onClick={playNext}>
+                    <SkipNextIcon sx={{ fontSize: 30 }} />
+                  </IconButton>
+                  <IconButton aria-label="반복" color={repeatMode !== 'off' ? 'primary' : 'default'} onClick={cycleRepeatMode}>
+                    {repeatMode === 'one' ? <RepeatOneIcon /> : <RepeatIcon />}
+                  </IconButton>
                   <IconButton aria-label="플레이리스트 열기" onClick={() => setOpenPlaylist(true)}>
                     <QueueMusicIcon />
                   </IconButton>

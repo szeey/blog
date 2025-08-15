@@ -45,6 +45,7 @@ export default function PostsPage() {
         justifyContent: "center",
         px: 2,
         width: "100%",
+        alignSelf: "flex-start",
       }}
     >
       <Box
@@ -74,7 +75,7 @@ export default function PostsPage() {
               params.set("page", "1");
               setSearchParams(params);
             }}
-            placeholder="Search by title or content"
+            placeholder="Search"
             variant="outlined"
             size="medium"
             sx={(theme) => ({
@@ -120,7 +121,9 @@ export default function PostsPage() {
                 <Box
                   sx={{
                     display: "flex",
-                    flexDirection: { xs: "column", sm: "row" },
+                    flexDirection: "row",
+                    alignItems: "stretch",
+                    gap: 0,
                   }}
                 >
                   <CardMedia
@@ -129,31 +132,21 @@ export default function PostsPage() {
                     alt={post.title}
                     sx={{
                       width: { xs: 160, sm: 200 },
-                      height: { xs: 160, sm: 200 },
+                      height: { xs: 120, sm: 150 },
                       objectFit: "cover",
                       flexShrink: 0,
                     }}
                   />
-                  <CardContent sx={{ flex: 1 }}>
-                    <Typography variant="h6" gutterBottom>
-                      {post.title}
+                  <CardContent sx={{ flex: 1, py: 1.25, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="h5" gutterBottom noWrap sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <strong>{post.title}</strong>
                     </Typography>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        mb: 1,
-                      }}
-                    >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 'auto' }}>
                       <Chip
                         size="small"
                         label={new Date(post.date).toLocaleDateString()}
                       />
                     </Box>
-                    <Typography variant="body2" color="text.secondary">
-                      {post.excerpt}
-                    </Typography>
                   </CardContent>
                 </Box>
               </CardActionArea>

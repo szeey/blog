@@ -13,6 +13,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Normalize box sizing to avoid overflow/centering quirks on small screens */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 html {
   /* Reserve scrollbar space to prevent horizontal layout shift between routes */
   scrollbar-gutter: stable;
@@ -33,6 +38,12 @@ body {
   min-height: 100vh;
   overflow-y: scroll;
 }
+
+/* Ensure images don't create stray inline gaps or overflow */
+img { display: block; max-width: 100%; height: auto; }
+
+/* Make icon buttons consistent size across devices for precise centering */
+.MuiIconButton-root { width: 40px; height: 40px; }
 
 h1 {
   font-size: 3.2em;

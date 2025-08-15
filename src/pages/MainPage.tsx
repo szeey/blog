@@ -157,7 +157,7 @@ export default function MainPage() {
                 <Box
                   sx={{
                     position: 'absolute',
-                    bottom: -52,
+                    bottom: -55,
                     left: '50%',
                     transform: 'translateX(-50%)',
                     width: '100%',
@@ -167,7 +167,11 @@ export default function MainPage() {
                   }}
                 >
                   {offset === 0 && (
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                    <Typography
+                      variant="subtitle1"
+                      noWrap
+                      sx={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                    >
                       {post.title}
                     </Typography>
                   )}

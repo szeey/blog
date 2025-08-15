@@ -15,13 +15,21 @@ const MenuDrawer = () => {
         disableScrollLock: true,
       }}
       sx={{
-        '& .MuiDrawer-paper': {
-          borderTopLeftRadius: 16,
-          borderTopRightRadius: 16,
-          backgroundColor: 'rgba(255, 255, 255, 0.5)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-        },
+        '& .MuiDrawer-paper': (theme) => ({
+          borderTopLeftRadius: 24,
+          borderTopRightRadius: 24,
+          backgroundColor:
+            theme.palette.mode === 'dark'
+              ? 'rgba(24, 24, 24, 0.75)'
+              : 'rgba(255, 255, 255, 0.75)',
+          backdropFilter: 'blur(28px)',
+          WebkitBackdropFilter: 'blur(28px)',
+          border: `1px solid ${theme.palette.divider}`,
+          boxShadow:
+            theme.palette.mode === 'dark'
+              ? '0 -16px 50px rgba(0,0,0,0.5)'
+              : '0 -20px 60px rgba(0,0,0,0.15)',
+        }),
       }}
     >
       <MenuPage />
