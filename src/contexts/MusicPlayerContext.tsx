@@ -1,43 +1,29 @@
-import { createContext, useState, useContext, useMemo, type ReactNode } from 'react';
+import { createContext, useState, useContext, useMemo, useEffect, type ReactNode } from 'react';
+import { loadSongs, type LoadedSong } from '../songs/loadSongs';
 
-interface Track {
-  id: number;
-  title: string;
-  artist: string;
-  albumArt: string;
-}
+type Track = LoadedSong;
 
-// mockup data
-const mockTracks: Track[] = [
-  {
-    id: 1,
-    title: '첫 번째 노래',
-    artist: '아티스트 A',
-    albumArt: 'https://source.unsplash.com/random/500x500?music&sig=1',
-  },
-  {
-    id: 2,
-    title: '두 번째 노래',
-    artist: '아티스트 B',
-    albumArt: 'https://source.unsplash.com/random/500x500?music&sig=2',
-  },
-  {
-    id: 3,
-    title: '세 번째 노래',
-    artist: '아티스트 C',
-    albumArt: 'https://source.unsplash.com/random/500x500?music&sig=3',
-  },
-];
+// fallback mock when no songs available
+const fallbackTracks: Track[] = [];
 
 interface MusicPlayerContextType {
   isPlayerOpen: boolean;
   isPlaying: boolean;
+  tracks: Track[];
   currentTrack: Track | null;
+  currentIndex: number;
   openPlayer: () => void;
   closePlayer: () => void;
+  play: () => void;
+  pause: () => void;
   togglePlay: () => void;
   playNext: () => void;
   playPrevious: () => void;
+  selectTrack: (index: number) => void;
+  isShuffling: boolean;
+  toggleShuffle: () => void;
+  repeatMode: 'off' | 'all' | 'one';
+  cycleRepeatMode: () => void;
 }
 
 const MusicPlayerContext = createContext<MusicPlayerContextType | undefined>(undefined);
@@ -53,31 +39,70 @@ export const useMusicPlayer = () => {
 export const MusicPlayerProvider = ({ children }: { children: ReactNode }) => {
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [tracks, setTracks] = useState<Track[]>(fallbackTracks);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+  const [isShuffling, setIsShuffling] = useState(false);
+  const [repeatMode, setRepeatMode] = useState<'off' | 'all' | 'one'>('off');
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const loaded = await loadSongs();
+        if (mounted && loaded.length > 0) {
+          setTracks(loaded);
+          setCurrentTrackIndex(0);
+        }
+      } catch {
+        // ignore and keep fallback
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   const openPlayer = () => setIsPlayerOpen(true);
   const closePlayer = () => setIsPlayerOpen(false);
-  const togglePlay = () => setIsPlaying(!isPlaying);
+  const play = () => setIsPlaying(true);
+  const pause = () => setIsPlaying(false);
+  const togglePlay = () => setIsPlaying((p) => !p);
 
   const playNext = () => {
-    setCurrentTrackIndex((prevIndex) => (prevIndex + 1) % mockTracks.length);
+    setCurrentTrackIndex((prevIndex) => (tracks.length ? (prevIndex + 1) % tracks.length : 0));
   };
 
   const playPrevious = () => {
-    setCurrentTrackIndex((prevIndex) => (prevIndex - 1 + mockTracks.length) % mockTracks.length);
+    setCurrentTrackIndex((prevIndex) => (tracks.length ? (prevIndex - 1 + tracks.length) % tracks.length : 0));
   };
 
-  const currentTrack = useMemo(() => mockTracks[currentTrackIndex], [currentTrackIndex]);
+  const selectTrack = (index: number) => {
+    if (!tracks.length) return;
+    const safe = ((index % tracks.length) + tracks.length) % tracks.length;
+    setCurrentTrackIndex(safe);
+  };
+
+  const toggleShuffle = () => setIsShuffling((s) => !s);
+  const cycleRepeatMode = () => setRepeatMode((m) => (m === 'off' ? 'all' : m === 'all' ? 'one' : 'off'));
+
+  const currentTrack = useMemo(() => (tracks.length ? tracks[currentTrackIndex] : null), [tracks, currentTrackIndex]);
 
   const value = {
     isPlayerOpen,
     isPlaying,
+    tracks,
     currentTrack,
+    currentIndex: currentTrackIndex,
     openPlayer,
     closePlayer,
+    play,
+    pause,
     togglePlay,
     playNext,
     playPrevious,
+    selectTrack,
+    isShuffling,
+    toggleShuffle,
+    repeatMode,
+    cycleRepeatMode,
   };
 
   return <MusicPlayerContext.Provider value={value}>{children}</MusicPlayerContext.Provider>;

@@ -4,6 +4,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Box from '@mui/material/Box';
+import Portal from '@mui/material/Portal';
 import { lightTheme, darkTheme } from './assets/theme';
 import { MenuProvider, useMenu } from './contexts/MenuContext';
 import { MusicPlayerProvider, useMusicPlayer } from './contexts/MusicPlayerContext';
@@ -33,8 +34,7 @@ const MainContent = () => {
         pt: '100px',
         pb: '120px',
         boxSizing: 'border-box',
-        transition: 'filter 0.3s ease-in-out',
-        filter: isPopupOpen ? 'blur(4px) brightness(0.7)' : 'none',
+        transition: 'opacity 0.2s ease-in-out',
       }}
     >
           <Routes>
@@ -43,6 +43,26 @@ const MainContent = () => {
             <Route path="/posts" element={<PostsPage />} />
             <Route path="/posts/:slug" element={<PostDetailPage />} />
           </Routes>
+          {/* Backdrop overlay to blur and dim content without affecting layout or fixed positioning */}
+          <Portal>
+            <Box
+              aria-hidden
+              sx={(theme) => ({
+                position: 'fixed',
+                inset: 0,
+                pointerEvents: 'none',
+                zIndex: theme.zIndex.drawer - 1,
+                opacity: isPopupOpen ? 1 : 0,
+                transition: 'opacity 200ms ease-in-out',
+                backdropFilter: isPopupOpen ? 'blur(4px)' : 'none',
+                WebkitBackdropFilter: isPopupOpen ? 'blur(4px)' : 'none',
+                backgroundColor:
+                  theme.palette.mode === 'dark'
+                    ? (isPopupOpen ? 'rgba(0,0,0,0.35)' : 'transparent')
+                    : (isPopupOpen ? 'rgba(255,255,255,0.25)' : 'transparent'),
+              })}
+            />
+          </Portal>
     </Box>
   );
 };

@@ -18,7 +18,9 @@ export default function AboutPage() {
         }}
       >
         <Typography variant="h3" sx={{ mb: 1, textAlign: "left" }}>
-          About
+          <strong>
+            About
+          </strong>
         </Typography>
       </Box>
     </Box>

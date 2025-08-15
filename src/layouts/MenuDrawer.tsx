@@ -10,6 +10,10 @@ const MenuDrawer = () => {
       anchor="bottom"
       open={isMenuOpen}
       onClose={closeMenu}
+      ModalProps={{
+        keepMounted: true,
+        disableScrollLock: true,
+      }}
       sx={{
         '& .MuiDrawer-paper': {
           borderTopLeftRadius: 16,

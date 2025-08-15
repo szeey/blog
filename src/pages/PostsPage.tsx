@@ -54,7 +54,9 @@ export default function PostsPage() {
         }}
       >
         <Typography variant="h3" sx={{ mb: 1, textAlign: "left" }}>
-          Posts
+          <strong>
+            Posts
+          </strong>
         </Typography>
 
         <Box sx={{ mb: 2 }}>
