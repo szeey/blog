@@ -126,17 +126,36 @@ export default function PostsPage() {
                     gap: 0,
                   }}
                 >
-                  <CardMedia
-                    component="img"
-                    image={post.thumbnail}
-                    alt={post.title}
-                    sx={{
-                      width: { xs: 160, sm: 200 },
-                      height: { xs: 120, sm: 150 },
-                      objectFit: "cover",
-                      flexShrink: 0,
-                    }}
-                  />
+                  {post.thumbnail ? (
+                    <CardMedia
+                      component="img"
+                      image={post.thumbnail}
+                      alt={post.title}
+                      sx={{
+                        width: { xs: 160, sm: 200 },
+                        height: { xs: 120, sm: 150 },
+                        objectFit: "cover",
+                        flexShrink: 0,
+                      }}
+                    />
+                  ) : (
+                    <Box
+                      sx={{
+                        width: { xs: 160, sm: 200 },
+                        height: { xs: 120, sm: 150 },
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        bgcolor: 'action.hover',
+                        color: 'text.secondary',
+                        flexShrink: 0,
+                        fontWeight: 600,
+                        fontSize: { xs: 14, sm: 16 },
+                      }}
+                    >
+                      No Photo
+                    </Box>
+                  )}
                   <CardContent sx={{ flex: 1, py: 1.25, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
                     <Typography variant="h5" gutterBottom noWrap sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       <strong>{post.title}</strong>

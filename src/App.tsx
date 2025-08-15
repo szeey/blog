@@ -35,6 +35,7 @@ const MainContent = () => {
         pb: '120px',
         boxSizing: 'border-box',
         transition: 'opacity 0.2s ease-in-out',
+        overflow: 'hidden',
       }}
     >
           <Routes>

@@ -36,6 +36,8 @@ const NowPlayingDrawer = () => {
     toggleShuffle,
     repeatMode,
     cycleRepeatMode,
+    queueOrder,
+    queueFirstIndex,
   } = useMusicPlayer();
 
   const [duration, setDuration] = React.useState(0);
@@ -117,20 +119,28 @@ const NowPlayingDrawer = () => {
             setDuration(h.getDuration());
           }}
           onEnded={() => {
+            // Repeat one: restart the same track
             if (repeatMode === 'one') {
               playerHandleRef.current?.seekTo(0);
               play();
               return;
             }
+            // Repeat all: advance (uses shuffle if enabled)
             if (repeatMode === 'all') {
               playNext();
               return;
             }
+            // Repeat off: if shuffle is on, keep shuffling
+            if (isShuffling) {
+              playNext();
+              return;
+            }
+            // No shuffle, no repeat: stop at the last item
             if (currentIndex < tracks.length - 1) {
               playNext();
             } else {
-              // Repeat off and last track: reset to first and pause (show play icon)
-              selectTrack(0);
+              // go to first of queue and pause (show play icon)
+              selectTrack(queueFirstIndex);
               pause();
             }
           }}
@@ -157,7 +167,7 @@ const NowPlayingDrawer = () => {
               <Box
                 component="img"
                 src={currentTrack.albumArt}
-                alt={`${currentTrack.title} 앨범 아트`}
+                alt={`${currentTrack.title} album artwork`}
                 sx={{
                   width: 200,
                   height: 200,
@@ -184,17 +194,27 @@ const NowPlayingDrawer = () => {
                     value={Math.min(Math.floor(currentTime), Math.floor(duration) || 1)}
                     onChange={handleSeek}
                     aria-label="progress"
-                    sx={{
-                      color: 'primary.main',
-                      height: 4,
-                      '& .MuiSlider-track': { border: 'none' },
-                      '& .MuiSlider-rail': { opacity: 0.3 },
-                      '& .MuiSlider-thumb': {
-                        width: 12,
-                        height: 12,
-                        boxShadow: '0 0 0 6px rgba(0,0,0,0.06)'
+                    sx={(theme) => ({
+                      height: 8,
+                      color: theme.palette.primary.main,
+                      borderRadius: 999,
+                      '& .MuiSlider-track': {
+                        border: 'none',
+                        borderRadius: 999,
+                        backgroundColor: theme.palette.primary.main,
                       },
-                    }}
+                      '& .MuiSlider-rail': {
+                        opacity: 1,
+                        borderRadius: 999,
+                        backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.16)' : 'rgba(0,0,0,0.12)',
+                      },
+                      '& .MuiSlider-thumb': {
+                        width: 0,
+                        height: 0,
+                        display: 'none',
+                        boxShadow: 'none',
+                      },
+                    })}
                   />
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5 }}>
                     <Typography variant="caption">{formatTime(currentTime)}</Typography>
@@ -214,29 +234,29 @@ const NowPlayingDrawer = () => {
                     columnGap: 0,
                   }}
                 >
-                  <IconButton aria-label="YouTube로 열기" onClick={() => { if (currentTrack?.url) window.open(currentTrack.url, '_blank', 'noopener,noreferrer'); }}>
+                  <IconButton aria-label="Open with YouTube" onClick={() => { if (currentTrack?.url) window.open(currentTrack.url, '_blank', 'noopener,noreferrer'); }}>
                     <YouTubeIcon />
                   </IconButton>
-                  <IconButton aria-label="셔플" color={isShuffling ? 'primary' : 'default'} onClick={toggleShuffle}>
+                  <IconButton aria-label="Shuffle" color={isShuffling ? 'primary' : 'default'} onClick={toggleShuffle}>
                     <ShuffleIcon />
                   </IconButton>
-                  <IconButton aria-label="이전 곡" onClick={playPrevious}>
+                  <IconButton aria-label="Previous" onClick={playPrevious}>
                     <SkipPreviousIcon sx={{ fontSize: 30 }} />
                   </IconButton>
-                  <IconButton aria-label="재생/일시정지" onClick={togglePlay}>
+                  <IconButton aria-label="Play/Pause" onClick={togglePlay}>
                     {isPlaying ? (
                       <PauseIcon sx={{ fontSize: 40 }} />
                     ) : (
                       <PlayArrowIcon sx={{ fontSize: 40 }} />
                     )}
                   </IconButton>
-                  <IconButton aria-label="다음 곡" onClick={playNext}>
+                  <IconButton aria-label="Next" onClick={playNext}>
                     <SkipNextIcon sx={{ fontSize: 30 }} />
                   </IconButton>
-                  <IconButton aria-label="반복" color={repeatMode !== 'off' ? 'primary' : 'default'} onClick={cycleRepeatMode}>
+                  <IconButton aria-label="Repeat" color={repeatMode !== 'off' ? 'primary' : 'default'} onClick={cycleRepeatMode}>
                     {repeatMode === 'one' ? <RepeatOneIcon /> : <RepeatIcon />}
                   </IconButton>
-                  <IconButton aria-label="플레이리스트 열기" onClick={() => setOpenPlaylist(true)}>
+                  <IconButton aria-label="Open playlist" onClick={() => setOpenPlaylist(true)}>
                     <QueueMusicIcon />
                   </IconButton>
                 </Box>
@@ -252,15 +272,17 @@ const NowPlayingDrawer = () => {
                 </IconButton>
               </Box>
               <Box sx={{ width: '100%', maxHeight: 280, overflowY: 'auto', px: 1 }}>
-                {tracks.map((t, i) => (
+                {(queueOrder.length ? queueOrder : tracks.map((_, i) => i)).map((idx, i) => {
+                  const t = tracks[idx];
+                  return (
                   <React.Fragment key={t.id}>
                     <Box
-                      onClick={() => { selectTrack(i); play(); setOpenPlaylist(false); }}
-                      sx={{ display: 'flex', alignItems: 'center', gap: 1.5, cursor: 'pointer', px: 1, py: 1, borderRadius: 1, backgroundColor: i === currentIndex ? 'action.hover' : 'transparent', '&:hover': { backgroundColor: 'action.hover' } }}
+                      onClick={() => { selectTrack(idx); play(); setOpenPlaylist(false); }}
+                      sx={{ display: 'flex', alignItems: 'center', gap: 1.5, cursor: 'pointer', px: 1, py: 1, borderRadius: 1, backgroundColor: idx === currentIndex ? 'action.hover' : 'transparent', '&:hover': { backgroundColor: 'action.hover' } }}
                     >
                       <Box component="img" src={t.albumArt} alt={t.title} sx={{ width: 44, height: 44, borderRadius: 1, objectFit: 'cover' }} />
                       <Box sx={{ minWidth: 0 }}>
-                        <Typography variant="body2" noWrap sx={{ fontWeight: i === currentIndex ? 700 : 400 }}>{t.title}</Typography>
+                        <Typography variant="body2" noWrap sx={{ fontWeight: idx === currentIndex ? 700 : 400 }}>{t.title}</Typography>
                         <Typography variant="caption" color="text.secondary" noWrap>
                           {formatArtist(t.artist)}
                         </Typography>
@@ -268,7 +290,8 @@ const NowPlayingDrawer = () => {
                     </Box>
                     {i < tracks.length - 1 && <Divider sx={{ my: 0.5 }} />}
                   </React.Fragment>
-                ))}
+                  );
+                })}
                 {tracks.length === 0 && (
                   <Typography variant="body2" color="text.secondary">재생 목록이 비어 있습니다.</Typography>
                 )}

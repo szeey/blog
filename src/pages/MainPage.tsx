@@ -141,19 +141,37 @@ export default function MainPage() {
                   pointerEvents: hidden ? 'none' : 'auto',
                 }}
               >
-                <Box
-                  component="img"
-                  src={post.thumbnail}
-                  alt={post.title}
-                  sx={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    borderRadius: 4,
-                    boxShadow: '0 20px 50px rgba(0,0,0,0.25)',
-                    backfaceVisibility: 'hidden',
-                  }}
-                />
+                {post.thumbnail ? (
+                  <Box
+                    component="img"
+                    src={post.thumbnail}
+                    alt={post.title}
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      borderRadius: 4,
+                      boxShadow: '0 20px 50px rgba(0,0,0,0.25)',
+                      backfaceVisibility: 'hidden',
+                    }}
+                  />
+                ) : (
+                  <Box
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: 4,
+                      bgcolor: 'action.hover',
+                      color: 'text.secondary',
+                      fontWeight: 600,
+                    }}
+                  >
+                    No Photo
+                  </Box>
+                )}
                 <Box
                   sx={{
                     position: 'absolute',

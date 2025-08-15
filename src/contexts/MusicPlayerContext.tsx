@@ -12,6 +12,10 @@ interface MusicPlayerContextType {
   tracks: Track[];
   currentTrack: Track | null;
   currentIndex: number;
+  queueIndex: number;
+  queueLastIndex: number;
+  queueFirstIndex: number;
+  queueOrder: number[];
   openPlayer: () => void;
   closePlayer: () => void;
   play: () => void;
@@ -43,6 +47,8 @@ export const MusicPlayerProvider = ({ children }: { children: ReactNode }) => {
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isShuffling, setIsShuffling] = useState(false);
   const [repeatMode, setRepeatMode] = useState<'off' | 'all' | 'one'>('off');
+  const [shuffleOrder, setShuffleOrder] = useState<number[] | null>(null);
+  const [shuffleIndex, setShuffleIndex] = useState<number>(0);
 
   useEffect(() => {
     let mounted = true;
@@ -66,24 +72,103 @@ export const MusicPlayerProvider = ({ children }: { children: ReactNode }) => {
   const pause = () => setIsPlaying(false);
   const togglePlay = () => setIsPlaying((p) => !p);
 
+  // legacy random picker removed; using deterministic shuffle queue
+
+  const generateShuffleOrder = (start: number, length: number): number[] => {
+    const indices = Array.from({ length }, (_, i) => i).filter((i) => i !== start);
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    return [start, ...indices];
+  };
+
   const playNext = () => {
-    setCurrentTrackIndex((prevIndex) => (tracks.length ? (prevIndex + 1) % tracks.length : 0));
+    setCurrentTrackIndex((prevIndex) => {
+      if (!tracks.length) return 0;
+      if (isShuffling && shuffleOrder) {
+        const nextPos = shuffleIndex + 1;
+        if (nextPos < shuffleOrder.length) {
+          setShuffleIndex(nextPos);
+          return shuffleOrder[nextPos];
+        }
+        if (repeatMode === 'all') {
+          setShuffleIndex(0);
+          return shuffleOrder[0];
+        }
+        // no movement when repeat off at the end
+        return prevIndex;
+      }
+      const next = prevIndex + 1;
+      if (next < tracks.length) return next;
+      return repeatMode === 'all' ? 0 : prevIndex;
+    });
   };
 
   const playPrevious = () => {
-    setCurrentTrackIndex((prevIndex) => (tracks.length ? (prevIndex - 1 + tracks.length) % tracks.length : 0));
+    setCurrentTrackIndex((prevIndex) => {
+      if (!tracks.length) return 0;
+      if (isShuffling && shuffleOrder) {
+        const prevPos = shuffleIndex - 1;
+        if (prevPos >= 0) {
+          setShuffleIndex(prevPos);
+          return shuffleOrder[prevPos];
+        }
+        if (repeatMode === 'all') {
+          const last = shuffleOrder.length - 1;
+          setShuffleIndex(last);
+          return shuffleOrder[last];
+        }
+        return prevIndex;
+      }
+      const prev = prevIndex - 1;
+      if (prev >= 0) return prev;
+      return repeatMode === 'all' ? tracks.length - 1 : prevIndex;
+    });
   };
 
   const selectTrack = (index: number) => {
     if (!tracks.length) return;
     const safe = ((index % tracks.length) + tracks.length) % tracks.length;
     setCurrentTrackIndex(safe);
+    if (isShuffling) {
+      if (shuffleOrder) {
+        const pos = shuffleOrder.indexOf(safe);
+        if (pos !== -1) setShuffleIndex(pos);
+        else {
+          const order = generateShuffleOrder(safe, tracks.length);
+          setShuffleOrder(order);
+          setShuffleIndex(0);
+        }
+      } else {
+        const order = generateShuffleOrder(safe, tracks.length);
+        setShuffleOrder(order);
+        setShuffleIndex(0);
+      }
+    }
   };
 
-  const toggleShuffle = () => setIsShuffling((s) => !s);
+  const toggleShuffle = () => {
+    setIsShuffling((s) => {
+      const next = !s;
+      if (next) {
+        const order = generateShuffleOrder(currentTrackIndex, tracks.length);
+        setShuffleOrder(order);
+        setShuffleIndex(0);
+      } else {
+        setShuffleOrder(null);
+        setShuffleIndex(0);
+      }
+      return next;
+    });
+  };
   const cycleRepeatMode = () => setRepeatMode((m) => (m === 'off' ? 'all' : m === 'all' ? 'one' : 'off'));
 
   const currentTrack = useMemo(() => (tracks.length ? tracks[currentTrackIndex] : null), [tracks, currentTrackIndex]);
+  const queueIndex = isShuffling && shuffleOrder ? shuffleIndex : currentTrackIndex;
+  const queueArray = isShuffling && shuffleOrder ? shuffleOrder : Array.from({ length: tracks.length }, (_, i) => i);
+  const queueLastIndex = queueArray.length - 1;
+  const queueFirstIndex = queueArray.length > 0 ? queueArray[0] : 0;
 
   const value = {
     isPlayerOpen,
@@ -91,6 +176,10 @@ export const MusicPlayerProvider = ({ children }: { children: ReactNode }) => {
     tracks,
     currentTrack,
     currentIndex: currentTrackIndex,
+    queueFirstIndex,
+    queueOrder: queueArray,
+    queueIndex,
+    queueLastIndex,
     openPlayer,
     closePlayer,
     play,
